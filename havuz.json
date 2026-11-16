@@ -1,7 +1,9 @@
 {
  "surum": 1,
- "guncelleme": "2026-11-16T12:28:03.780Z",
- "islenenler": [],
+ "guncelleme": "2026-11-16T12:32:13.270Z",
+ "islenenler": [
+  "gTEST1"
+ ],
  "konular": [
   {
    "id": "selam",
