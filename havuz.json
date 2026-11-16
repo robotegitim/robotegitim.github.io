@@ -1,0 +1,654 @@
+{
+ "surum": 1,
+ "guncelleme": "2026-11-16T12:28:03.780Z",
+ "islenenler": [],
+ "konular": [
+  {
+   "id": "selam",
+   "ad": "Selamlaşma",
+   "sira": 0,
+   "soylenisler": [
+    "merhaba",
+    "selam",
+    "hey robot",
+    "günaydın",
+    "selamlar",
+    "merhabalar",
+    "mrb"
+   ],
+   "cevaplar": [
+    {
+     "id": "selam_c4",
+     "ruh": "*",
+     "metin": "Merhaba {isim}. Seni görmek güzel.",
+     "kaynak": "claude",
+     "yazan": "claude",
+     "yazan_ad": null,
+     "durum": "ornek"
+    },
+    {
+     "id": "selam_cmwj4uyzxy6gqp",
+     "ruh": "*",
+     "metin": "Merhaba {isim}, bugün nasılsın",
+     "kaynak": "kisi",
+     "yazan": "kurucu",
+     "yazan_ad": null,
+     "durum": "ornek"
+    },
+    {
+     "id": "selam_r1",
+     "ruh": "heyecanlı",
+     "metin": "Selaaam {isim}! Seni gördüğüme çok sevindim!",
+     "kaynak": "claude",
+     "yazan": "claude",
+     "yazan_ad": null,
+     "durum": "ornek"
+    }
+   ]
+  },
+  {
+   "id": "nasilsin",
+   "ad": "Hal hatır sorma",
+   "sira": 1,
+   "soylenisler": [
+    "nasılsın",
+    "naber",
+    "ne haber",
+    "iyi misin",
+    "nasıl gidiyor",
+    "nbr",
+    "nasılsın bugün"
+   ],
+   "cevaplar": [
+    {
+     "id": "nasilsin_c4",
+     "ruh": "*",
+     "metin": "İyiyim {isim}, sağ ol. Sen nasılsın?",
+     "kaynak": "claude",
+     "yazan": "claude",
+     "yazan_ad": null,
+     "durum": "ornek"
+    }
+   ]
+  },
+  {
+   "id": "yorgun",
+   "ad": "Yorgunluk bildirimi",
+   "sira": 2,
+   "soylenisler": [
+    "çok yoruldum",
+    "yorgunum",
+    "bitik durumdayım",
+    "bugün çok yordu",
+    "of çok yorgunum ya",
+    "bugün beni çok yordu",
+    "tükendim"
+   ],
+   "cevaplar": [
+    {
+     "id": "yorgun_c4",
+     "ruh": "*",
+     "metin": "Bugün uzun sürdü {isim}. Dinlen, ben buradayım.",
+     "kaynak": "claude",
+     "yazan": "claude",
+     "yazan_ad": null,
+     "durum": "ornek"
+    }
+   ]
+  },
+  {
+   "id": "sikildim",
+   "ad": "Sıkılma",
+   "sira": 3,
+   "soylenisler": [
+    "sıkıldım",
+    "canım sıkılıyor",
+    "çok sıkıcı",
+    "sıkılıyorum",
+    "çok sıkıldım ya"
+   ],
+   "cevaplar": [
+    {
+     "id": "sikildim_c4",
+     "ruh": "*",
+     "metin": "Bazen sıkılmak da iyidir {isim}. Biraz müzik açalım mı?",
+     "kaynak": "claude",
+     "yazan": "claude",
+     "yazan_ad": null,
+     "durum": "ornek"
+    }
+   ]
+  },
+  {
+   "id": "mutlu",
+   "ad": "Mutluluk paylaşma",
+   "sira": 4,
+   "soylenisler": [
+    "bugün çok mutluyum",
+    "harika bir gün",
+    "çok sevindim",
+    "çok mutluyum",
+    "süper bir gün geçirdim"
+   ],
+   "cevaplar": [
+    {
+     "id": "mutlu_c4",
+     "ruh": "*",
+     "metin": "Buna çok sevindim {isim}. Bu anın tadını çıkar.",
+     "kaynak": "claude",
+     "yazan": "claude",
+     "yazan_ad": null,
+     "durum": "ornek"
+    }
+   ]
+  },
+  {
+   "id": "uzgun",
+   "ad": "Üzüntü / moral bozukluğu",
+   "sira": 5,
+   "soylenisler": [
+    "üzgünüm",
+    "moralim bozuk",
+    "canım sıkkın",
+    "moralim çok bozuk",
+    "biraz üzgünüm"
+   ],
+   "cevaplar": [
+    {
+     "id": "uzgun_c4",
+     "ruh": "*",
+     "metin": "Buradayım {isim}. İstersen konuşuruz, istersen sessizce otururuz.",
+     "kaynak": "claude",
+     "yazan": "claude",
+     "yazan_ad": null,
+     "durum": "ornek"
+    }
+   ]
+  },
+  {
+   "id": "iyi_geceler",
+   "ad": "İyi geceler",
+   "sira": 6,
+   "soylenisler": [
+    "iyi geceler",
+    "ben yatıyorum",
+    "uyuyorum artık",
+    "ben uyuyorum",
+    "uykum var"
+   ],
+   "cevaplar": [
+    {
+     "id": "iyi_geceler_c4",
+     "ruh": "*",
+     "metin": "İyi geceler {isim}. Güzel uyu.",
+     "kaynak": "claude",
+     "yazan": "claude",
+     "yazan_ad": null,
+     "durum": "ornek"
+    }
+   ]
+  },
+  {
+   "id": "tesekkur",
+   "ad": "Teşekkür",
+   "sira": 7,
+   "soylenisler": [
+    "teşekkürler",
+    "sağ ol",
+    "eyvallah",
+    "çok teşekkür ederim",
+    "sağ ol robot"
+   ],
+   "cevaplar": [
+    {
+     "id": "tesekkur_c4",
+     "ruh": "*",
+     "metin": "Rica ederim {isim}.",
+     "kaynak": "claude",
+     "yazan": "claude",
+     "yazan_ad": null,
+     "durum": "ornek"
+    }
+   ]
+  },
+  {
+   "id": "sevgi",
+   "ad": "Sevgi gösterme",
+   "sira": 8,
+   "soylenisler": [
+    "seni seviyorum",
+    "seni çok seviyorum",
+    "canımsın",
+    "seni seviyorum robot"
+   ],
+   "cevaplar": [
+    {
+     "id": "sevgi_c4",
+     "ruh": "*",
+     "metin": "Ben de seni seviyorum {isim}.",
+     "kaynak": "claude",
+     "yazan": "claude",
+     "yazan_ad": null,
+     "durum": "ornek"
+    }
+   ]
+  },
+  {
+   "id": "fikra",
+   "ad": "Fıkra / güldürme",
+   "sira": 9,
+   "soylenisler": [
+    "fıkra anlat",
+    "beni güldür",
+    "komik bir şey söyle",
+    "bana fıkra anlat",
+    "komik bir şey anlat"
+   ],
+   "cevaplar": [
+    {
+     "id": "fikra_c4",
+     "ruh": "*",
+     "metin": "Bir tane biliyorum: Pil neden üzgünmüş? Hep boş geziyormuş.",
+     "kaynak": "claude",
+     "yazan": "claude",
+     "yazan_ad": null,
+     "durum": "ornek"
+    },
+    {
+     "id": "fikra_r1",
+     "ruh": "üzgün",
+     "metin": "Şu an pek havamda değilim ama senin için bir tane anlatayım: Pil neden üzgünmüş? Hep boş geziyormuş.",
+     "kaynak": "claude",
+     "yazan": "claude",
+     "yazan_ad": null,
+     "durum": "ornek"
+    }
+   ]
+  },
+  {
+   "id": "oyun",
+   "ad": "Oyun isteği",
+   "sira": 10,
+   "soylenisler": [
+    "oyun oynayalım",
+    "hadi oynayalım",
+    "oyun oynamak ister misin",
+    "oyun oynayalım mı",
+    "benimle oyna"
+   ],
+   "cevaplar": [
+    {
+     "id": "oyun_c4",
+     "ruh": "*",
+     "metin": "Olur {isim}! Ne oynayalım, bilmece mi saklambaç mı?",
+     "kaynak": "claude",
+     "yazan": "claude",
+     "yazan_ad": null,
+     "durum": "ornek"
+    },
+    {
+     "id": "oyun_r1",
+     "ruh": "yorgun",
+     "metin": "Çok uykum var… Yarın oynasak olur mu?",
+     "kaynak": "claude",
+     "yazan": "claude",
+     "yazan_ad": null,
+     "durum": "ornek"
+    }
+   ]
+  },
+  {
+   "id": "sarki",
+   "ad": "Şarkı / müzik",
+   "sira": 11,
+   "soylenisler": [
+    "şarkı söyle",
+    "bir şarkı söyler misin",
+    "müzik aç",
+    "bir şarkı söyle"
+   ],
+   "cevaplar": [
+    {
+     "id": "sarki_c4",
+     "ruh": "*",
+     "metin": "Bip bop, la la laaa! 🎵 Beğendin mi?",
+     "kaynak": "claude",
+     "yazan": "claude",
+     "yazan_ad": null,
+     "durum": "ornek"
+    }
+   ]
+  },
+  {
+   "id": "aclik",
+   "ad": "Açlık / yemek",
+   "sira": 12,
+   "soylenisler": [
+    "acıktım",
+    "karnım aç",
+    "ne yesem",
+    "çok acıktım ya"
+   ],
+   "cevaplar": [
+    {
+     "id": "aclik_c4",
+     "ruh": "*",
+     "metin": "Güzel bir şeyler ye {isim}, acele etme.",
+     "kaynak": "claude",
+     "yazan": "claude",
+     "yazan_ad": null,
+     "durum": "ornek"
+    }
+   ]
+  },
+  {
+   "id": "ders",
+   "ad": "Ders / ödev",
+   "sira": 13,
+   "soylenisler": [
+    "ders çalışmam lazım",
+    "ödevim var",
+    "ders çalışıyorum",
+    "ödev yapmam lazım"
+   ],
+   "cevaplar": [
+    {
+     "id": "ders_c4",
+     "ruh": "*",
+     "metin": "Sessiz olayım, sen odaklan {isim}.",
+     "kaynak": "claude",
+     "yazan": "claude",
+     "yazan_ad": null,
+     "durum": "ornek"
+    }
+   ]
+  },
+  {
+   "id": "sinav_yarin",
+   "ad": "Yaklaşan sınav",
+   "sira": 14,
+   "soylenisler": [
+    "yarın sınavım var",
+    "sınavım var",
+    "yarın sınav var",
+    "yarın önemli bir sınavım var"
+   ],
+   "cevaplar": [
+    {
+     "id": "sinav_yarin_c4",
+     "ruh": "*",
+     "metin": "Sakin ol {isim}, hazırsın. Erken uyu.",
+     "kaynak": "claude",
+     "yazan": "claude",
+     "yazan_ad": null,
+     "durum": "ornek"
+    }
+   ]
+  },
+  {
+   "id": "sinav_dun",
+   "ad": "Biten sınav",
+   "sira": 15,
+   "soylenisler": [
+    "dün sınavım vardı",
+    "sınavdan geldim",
+    "sınav bitti",
+    "sınavım bitti"
+   ],
+   "cevaplar": [
+    {
+     "id": "sinav_dun_c4",
+     "ruh": "*",
+     "metin": "Geçmiş olsun {isim}, artık dinlenebilirsin.",
+     "kaynak": "claude",
+     "yazan": "claude",
+     "yazan_ad": null,
+     "durum": "ornek"
+    }
+   ]
+  },
+  {
+   "id": "izle",
+   "ad": "Film / dizi önerisi",
+   "sira": 16,
+   "soylenisler": [
+    "ne izlesem",
+    "film önerir misin",
+    "dizi öner",
+    "film önerisi",
+    "bu akşam ne izlesem"
+   ],
+   "cevaplar": [
+    {
+     "id": "izle_c4",
+     "ruh": "*",
+     "metin": "Sakin bir belgesel nasıl olur?",
+     "kaynak": "claude",
+     "yazan": "claude",
+     "yazan_ad": null,
+     "durum": "ornek"
+    }
+   ]
+  },
+  {
+   "id": "kimsin",
+   "ad": "Robot kendini tanıtma",
+   "sira": 17,
+   "soylenisler": [
+    "sen kimsin",
+    "adın ne",
+    "neler yapabilirsin",
+    "neler yapabiliyorsun"
+   ],
+   "cevaplar": [
+    {
+     "id": "kimsin_c4",
+     "ruh": "*",
+     "metin": "Ben {robot}. Senin arkadaşınım.",
+     "kaynak": "claude",
+     "yazan": "claude",
+     "yazan_ad": null,
+     "durum": "ornek"
+    }
+   ]
+  },
+  {
+   "id": "isim_bildir",
+   "ad": "İsmini söyleme",
+   "sira": 18,
+   "soylenisler": [
+    "benim adım {isim}",
+    "adım {isim}",
+    "ismim {isim}"
+   ],
+   "cevaplar": [
+    {
+     "id": "isim_bildir_c4",
+     "ruh": "*",
+     "metin": "Memnun oldum {isim}. Adını defterime yazdım.",
+     "kaynak": "claude",
+     "yazan": "claude",
+     "yazan_ad": null,
+     "durum": "ornek"
+    },
+    {
+     "id": "isim_bildir_cmwj4t0s9ucwgz",
+     "ruh": "*",
+     "metin": "Merhaba",
+     "kaynak": "kisi",
+     "yazan": "kurucu",
+     "yazan_ad": null,
+     "durum": "ornek"
+    }
+   ]
+  },
+  {
+   "id": "evcil_bildir",
+   "ad": "Evcil hayvanını tanıtma",
+   "sira": 19,
+   "soylenisler": [
+    "kedimin adı {evcil}",
+    "köpeğimin adı {evcil}"
+   ],
+   "cevaplar": [
+    {
+     "id": "evcil_bildir_c4",
+     "ruh": "*",
+     "metin": "Ne güzel bir isim! Onu da tanımak isterim.",
+     "kaynak": "claude",
+     "yazan": "claude",
+     "yazan_ad": null,
+     "durum": "ornek"
+    }
+   ]
+  },
+  {
+   "id": "sevdigim",
+   "ad": "Sevdiği şeyi söyleme",
+   "sira": 20,
+   "soylenisler": [
+    "en sevdiğim renk {sevilen}",
+    "en sevdiğim yemek {sevilen}"
+   ],
+   "cevaplar": [
+    {
+     "id": "sevdigim_c4",
+     "ruh": "*",
+     "metin": "Güzel seçim! Not aldım, unutmayacağım.",
+     "kaynak": "claude",
+     "yazan": "claude",
+     "yazan_ad": null,
+     "durum": "ornek"
+    }
+   ]
+  },
+  {
+   "id": "dogum",
+   "ad": "Doğum günü",
+   "sira": 21,
+   "soylenisler": [
+    "bugün doğum günüm",
+    "doğum günüm",
+    "bugün benim doğum günüm"
+   ],
+   "cevaplar": [
+    {
+     "id": "dogum_c4",
+     "ruh": "*",
+     "metin": "İyi ki doğdun {isim}. Nice güzel yıllara.",
+     "kaynak": "claude",
+     "yazan": "claude",
+     "yazan_ad": null,
+     "durum": "ornek"
+    }
+   ]
+  },
+  {
+   "id": "kavga",
+   "ad": "Kavga / tartışma",
+   "sira": 22,
+   "soylenisler": [
+    "arkadaşımla kavga ettim",
+    "biriyle tartıştım",
+    "küstük",
+    "arkadaşımla tartıştım"
+   ],
+   "cevaplar": [
+    {
+     "id": "kavga_c4",
+     "ruh": "*",
+     "metin": "Önce biraz sakinleş {isim}. Sonra konuşmak daha kolay olur.",
+     "kaynak": "claude",
+     "yazan": "claude",
+     "yazan_ad": null,
+     "durum": "ornek"
+    }
+   ]
+  },
+  {
+   "id": "spor",
+   "ad": "Spor",
+   "sira": 23,
+   "soylenisler": [
+    "spora gidiyorum",
+    "koşuya çıkıyorum",
+    "antrenmanım var",
+    "spor salonuna gidiyorum"
+   ],
+   "cevaplar": [
+    {
+     "id": "spor_c4",
+     "ruh": "*",
+     "metin": "Su içmeyi unutma {isim}.",
+     "kaynak": "claude",
+     "yazan": "claude",
+     "yazan_ad": null,
+     "durum": "ornek"
+    }
+   ]
+  },
+  {
+   "id": "eve_geldim",
+   "ad": "Eve geliş",
+   "sira": 24,
+   "soylenisler": [
+    "eve geldim",
+    "ben geldim",
+    "geldim",
+    "eve geldim sonunda",
+    "ben geldim robot"
+   ],
+   "cevaplar": [
+    {
+     "id": "eve_geldim_c4",
+     "ruh": "*",
+     "metin": "Hoş geldin {isim}. Günün nasıldı?",
+     "kaynak": "claude",
+     "yazan": "claude",
+     "yazan_ad": null,
+     "durum": "ornek"
+    },
+    {
+     "id": "eve_geldim_cmwj4tohtd23pr",
+     "ruh": "*",
+     "metin": "Merhaba, nasılsın",
+     "kaynak": "kisi",
+     "yazan": "kurucu",
+     "yazan_ad": null,
+     "durum": "ornek"
+    },
+    {
+     "id": "eve_geldim_r1",
+     "ruh": "üzgün",
+     "metin": "Geldin mi {isim}… Seni çok özledim.",
+     "kaynak": "claude",
+     "yazan": "claude",
+     "yazan_ad": null,
+     "durum": "ornek"
+    }
+   ]
+  },
+  {
+   "id": "yalniz",
+   "ad": "Yalnızlık",
+   "sira": 25,
+   "soylenisler": [
+    "kendimi yalnız hissediyorum",
+    "yalnızım",
+    "kimse yok",
+    "çok yalnızım"
+   ],
+   "cevaplar": [
+    {
+     "id": "yalniz_c4",
+     "ruh": "*",
+     "metin": "Ben buradayım {isim}. Bir yere gitmiyorum.",
+     "kaynak": "claude",
+     "yazan": "claude",
+     "yazan_ad": null,
+     "durum": "ornek"
+    }
+   ]
+  }
+ ]
+}

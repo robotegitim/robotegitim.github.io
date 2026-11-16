@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="havuz-mantik.js"></script>
 <style>
 /* Düzen: tek sütun sohbet. Üstte robot vizörü, ortada konuşma, altta yazma çubuğu. */
 :root{
@@ -208,9 +208,11 @@ textarea{resize:vertical;min-height:70px;font-size:15.5px}
 
 <script>
 'use strict';
-/* ---------- bağlantı ---------- */
-const SUPABASE_URL='__SUPABASE_URL__';
-const SUPABASE_KEY='__SUPABASE_KEY__';
+/* ---------- bağlantı ----------
+   Havuz: bu depodaki havuz.json (herkes okur).
+   Günlük: her öğretme Google Formuna bir satır olarak gider; kurucu belirli aralıklarla havuza işler. */
+const FORM_URL='https://docs.google.com/forms/d/e/1FAIpQLSfFrsRn1CHdhj1OMiqpGFTXfKSVADjCkZcwys_akaH0VhWInA/formResponse';
+const FORM_ALAN='entry.1378920939';
 
 const ROBOT='Pıtır';
 const RUHLAR=['mutlu','üzgün','yorgun','heyecanlı'];
@@ -245,10 +247,12 @@ function kimlikOku(){ try{ const k=JSON.parse(localStorage.getItem('robot-kimlik
 function kimlikYaz(k){ try{ localStorage.setItem('robot-kimlik',JSON.stringify(k)); }catch(e){} }
 
 /* ---------- durum ---------- */
-const S={sb:null,kim:{id:yeniId('u'),ad:''},konular:new Map(),yuklendi:false,sekme:'konus',ruh:'*',akis:[],acik:new Set(),yukleniyor:false};
-const aktifKonular=()=>[...S.konular.values()].sort((a,b)=>(a.sira-b.sira)||a.ad.localeCompare(b.ad,'tr'));
-const soylenisler=k=>k.soylenis;
+const S={kim:{id:yeniId('u'),ad:''},havuz:null,yerel:[],konular:new Map(),yuklendi:false,sekme:'konus',ruh:'*',akis:[],acik:new Set(),yukleniyor:false};
+const aktifKonular=()=>[...S.konular.values()].sort((a,b)=>((a.sira??1000)-(b.sira??1000))||a.ad.localeCompare(b.ad,'tr'));
+const soylenisler=k=>k.soylenisler;
 const cevaplar=k=>k.cevaplar;
+function depoOku(a,v){ try{ const x=JSON.parse(localStorage.getItem(a)||'null'); return x??v; }catch(e){ return v; } }
+function depoYaz(a,x){ try{ localStorage.setItem(a,JSON.stringify(x)); }catch(e){} }
 function isimAl(c){ if(c.kaynak==='claude') return 'Claude örneği'; if(c.yazan&&c.yazan===S.kim.id) return 'sen'; return c.yazan_ad||'biri'; }
 function ctx(){ return {isim:(S.kim.ad||'').split(' ')[0]||'',robot:ROBOT}; }
 function doldur(s,c){
@@ -281,34 +285,45 @@ function cevapBul(k,ruh){
 }
 
 /* ---------- veri ---------- */
-async function hepsi(tablo,sirala){
-  const out=[]; for(let i=0;;i+=1000){
-    let q=S.sb.from(tablo).select('*').range(i,i+999); if(sirala) q=q.order(sirala,{ascending:true}).order('id',{ascending:true});
-    const {data,error}=await q; if(error) throw error; out.push(...data); if(data.length<1000) break;
-  } return out;
+/* Ortak havuz (havuz.json) + bu cihazda öğretilen ama henüz havuza işlenmemiş kayıtlar (yerel) */
+function yenidenKur(){
+  if(!S.havuz) return;
+  const h=JSON.parse(JSON.stringify(S.havuz)), islenen=new Set(h.islenenler||[]);
+  S.yerel=S.yerel.filter(g=>!islenen.has(g.lid)); depoYaz('robot-yerel',S.yerel);
+  for(const g of S.yerel) HavuzMantik.uygula(h,g);
+  S.konular=new Map(h.konular.filter(k=>!k.silindi).map(k=>[k.id,{...k,soylenisler:k.soylenisler||[],cevaplar:(k.cevaplar||[]).filter(c=>!c.silindi).map(c=>({...c,ruh:RUHLAR.includes(c.ruh)?c.ruh:'*'}))}]));
 }
 async function yukle(){
-  if(!S.sb||S.yukleniyor) return; S.yukleniyor=true;
+  if(S.yukleniyor) return; S.yukleniyor=true;
   try{
-    const [ks,ss,cs,ts]=await Promise.all([hepsi('konular'),hepsi('soylenisler'),hepsi('cevaplar'),hepsi('tepkiler','olusturma')]);
-    const son=new Map(); for(const t of ts) son.set(t.cevap_id,t.tur);
-    const m=new Map();
-    for(const k of ks) if(!k.silindi) m.set(k.id,{id:k.id,ad:k.ad,sira:k.sira??1000,soylenis:[],cevaplar:[]});
-    for(const s of ss) if(!s.silindi&&m.has(s.konu_id)) m.get(s.konu_id).soylenis.push(s.metin);
-    for(const c of cs) if(!c.silindi&&m.has(c.konu_id)){ const d=son.get(c.id); m.get(c.konu_id).cevaplar.push({...c,durum:d==='begen'?'onay':d==='begenme'?'red':'ornek'}); }
-    S.konular=m; S.yuklendi=true; uyar(''); ciz();
-  }catch(e){ console.error(e); if(!S.yuklendi) uyar('Havuza ulaşılamıyor. İnternet bağlantını kontrol edip sayfayı yenile.'); }
+    const r=await fetch('havuz.json?t='+Date.now(),{cache:'no-store'}); if(!r.ok) throw new Error(r.status);
+    S.havuz=await r.json(); yenidenKur(); S.yuklendi=true; uyar(''); ciz();
+  }catch(e){ console.error(e); if(!S.yuklendi) uyar('Havuz yüklenemedi. İnternet bağlantını kontrol edip sayfayı yenile.'); }
   finally{ S.yukleniyor=false; }
 }
 function toast(t){const e=$('#toast'); e.textContent=t; e.classList.add('on'); clearTimeout(e._t); e._t=setTimeout(()=>e.classList.remove('on'),3000);}
 function uyar(t){const e=$('#uyari'); if(!t){e.hidden=true;return;} e.textContent=t; e.hidden=false;}
-async function ekle(tablo,satirlar){
-  const {error}=await S.sb.from(tablo).insert(satirlar);
-  if(error){ console.error(error); toast('Kaydedilemedi. Bağlantını kontrol edip tekrar dene.'); return false; }
+/* günlüğe gönderme: önce cihazdaki kuyruğa yazılır, sonra forma gönderilir; internet yoksa sonra tekrar denenir */
+let gonderiliyor=false;
+async function kuyrukGonder(){
+  if(gonderiliyor) return; gonderiliyor=true;
+  try{
+    let q=depoOku('robot-kuyruk',[]);
+    while(q.length){
+      const g=q[0];
+      try{ await fetch(FORM_URL,{method:'POST',mode:'no-cors',body:new URLSearchParams({[FORM_ALAN]:JSON.stringify(g)})}); }
+      catch(e){ break; }
+      q=depoOku('robot-kuyruk',[]).filter(x=>x.lid!==g.lid); depoYaz('robot-kuyruk',q);
+    }
+  } finally { gonderiliyor=false; }
+}
+function gunlukEkle(g){
+  g.lid=yeniId('g'); g.zaman=new Date().toISOString(); g.kim={id:S.kim.id,ad:S.kim.ad||''};
+  S.yerel.push(g); depoYaz('robot-yerel',S.yerel);
+  const q=depoOku('robot-kuyruk',[]); q.push(g); depoYaz('robot-kuyruk',q);
+  yenidenKur(); kuyrukGonder();
   return true;
 }
-const imza=()=>({yazan:S.kim.id,yazan_ad:S.kim.ad||null});
-async function soylenisEkle(k,m){ if(soylenisler(k).some(s=>norm(s)===norm(m))) return true; return ekle('soylenisler',[{konu_id:k.id,metin:m.slice(0,200),...imza()}]); }
 
 /* ---------- sohbet ---------- */
 function ruhAyarla(r){
@@ -354,7 +369,7 @@ function mesajHtml(m){
   const k=S.konular.get(m.kid), c=mesajCevap(m);
   let r=`<div class="m sen"><div class="balon">${esc(m.metin)}</div>${m.ruh!=='*'?`<span class="ruh-et">robot ${RUH_EMOJI[m.ruh]} ${esc(m.ruh)}</span>`:''}</div><div class="m robot">`;
   if(m.durum==='kaydedildi'){
-    r+=`<div class="balon">${esc(doldur(m.yeniMetin,ctx()))}</div><span class="durum">✓ Öğrendim! ${m.yeniRuh==='*'?'Bundan sonra böyle diyeceğim.':RUH_AD[m.yeniRuh]+' böyle diyeceğim.'}</span>`;
+    r+=`<div class="balon">${esc(doldur(m.yeniMetin,ctx()))}</div><span class="durum">✓ Öğrendim! ${m.yeniRuh==='*'?'Bundan sonra böyle diyeceğim.':RUH_AD[m.yeniRuh]+' böyle diyeceğim.'}</span><span class="meta">Senin robotunda hemen geçerli. Herkesin robotuna bir sonraki havuz güncellemesinde gider.</span>`;
   }else if(m.durum==='bilmiyor'||!c){
     r+=`<div class="balon bilmiyor">Bunu henüz bilmiyorum. Ne demeliyim?</div>`+duzeltFormu(m,'Bana öğret');
   }else{
@@ -362,7 +377,7 @@ function mesajHtml(m){
     const not=m.tur==='ruh'?` · ${RUH_EMOJI[m.ruh]} ${esc(m.ruh)}ken söylediği özel cevap`:m.tur==='genel-yedek'?` · ${esc(m.ruh)}ken özel cevabı yok, genel cevabı söyledi`:'';
     r+=`<span class="meta">Konu: <b>${esc(k?k.ad:'')}</b> · yazan: ${esc(isimAl(c))}${c.durum==='onay'?' · onaylı':''}${not}</span>`;
     if(m.durum==='bekle') r+=`<div class="tepki"><button class="btn iyi" data-iyi="${m.id}" type="button">👍 Beğendim</button><button class="btn kotu" data-kotu="${m.id}" type="button">👎 Beğenmedim</button></div>`;
-    else if(m.durum==='onay') r+=`<span class="durum">✓ Onayladın. Bu cevap havuzda.</span>`;
+    else if(m.durum==='onay') r+=`<span class="durum">✓ Onayladın. Teşekkürler!</span>`;
     else if(m.durum==='duzelt') r+=duzeltFormu(m,'Ne demeliydi?');
   }
   return r+'</div>';
@@ -376,29 +391,17 @@ async function kaydet(id){
   const is=ozelIsimler(metin); if(is.length&&!m.uyariGoruldu&&!engel){uy.push(['warn',`“${is.join(', ')}” bir isim gibi görünüyor. Herkese uyması için yerine {isim} yazabilirsin. Böyle kalsın istiyorsan tekrar Kaydet’e bas.`]); m.uyariGoruldu=true; engel=true;}
   $('#du-'+id).innerHTML=uy.map(([t,s])=>`<div class="uyari ${t==='bad'?'bad':''}">${slotlu(s)}</div>`).join('');
   if(engel) return;
-  const cid=yeniId('c'); let ok=false, hedef=kid;
-  if(kid==='__yeni'){
-    hedef=yeniId('k');
-    ok=await ekle('konular',[{id:hedef,ad:yeniAd.slice(0,80),...imza()}])
-      && await ekle('soylenisler',[{konu_id:hedef,metin:m.metin.slice(0,200),...imza()}])
-      && await ekle('cevaplar',[{id:cid,konu_id:hedef,ruh,metin,...imza()}])
-      && await ekle('tepkiler',[{cevap_id:cid,tur:'begen',...imza()}]);
-  }else{
-    const k=S.konular.get(kid); if(!k) return;
-    ok=await ekle('cevaplar',[{id:cid,konu_id:kid,ruh,metin,...imza()}])
-      && await ekle('tepkiler',[{cevap_id:cid,tur:'begen',...imza()}])
-      && await soylenisEkle(k,m.metin);
-    // beğenilmeyen cevap aynı konuda ve aynı kapsamdaysa yerine yenisi geçer
-    if(ok&&m.cid&&kid===m.kid&&(m.cruh||'*')===ruh) ok=await ekle('tepkiler',[{cevap_id:m.cid,tur:'begenme',...imza()}]);
-    if(ok&&m.cid&&kid!==m.kid) toast('Konu düzeltildi. Bu cümle artık o konuya gidecek.');
-  }
-  if(ok){ m.kid=hedef; m.cid=cid; m.durum='kaydedildi'; m.yeniMetin=metin; m.yeniRuh=ruh; akisCiz(); yukle(); }
+  const cid=yeniId('c'), hedef=kid==='__yeni'?yeniId('k'):kid;
+  if(kid!=='__yeni'&&!S.konular.get(kid)) return;
+  // beğenilmeyen cevap aynı konudaysa "eski" olarak bildirilir; aynı kapsamdaysa (ikisi de "her zaman" ya da aynı ruh hali) yerine yenisi geçer
+  gunlukEkle({t:'ogret',kid:hedef,konu_ad:kid==='__yeni'?yeniAd.slice(0,80):undefined,metin:m.metin,cevap:metin,ruh,cid,eski:m.cid&&kid===m.kid?m.cid:undefined});
+  if(m.cid&&kid!=='__yeni'&&kid!==m.kid) toast('Konu düzeltildi. Bu cümle artık o konuya gidecek.');
+  m.kid=hedef; m.cid=cid; m.durum='kaydedildi'; m.yeniMetin=metin; m.yeniRuh=ruh; akisCiz(); ozetCiz();
 }
 async function begen(id){
-  const m=S.akis.find(x=>x.id===id); if(!m||!m.cid) return;
-  const k=S.konular.get(m.kid); if(!k) return;
-  const ok=await ekle('tepkiler',[{cevap_id:m.cid,tur:'begen',...imza()}]) && await soylenisEkle(k,m.metin);
-  if(ok){ m.durum='onay'; akisCiz(); yukle(); }
+  const m=S.akis.find(x=>x.id===id); if(!m||!m.cid||!S.konular.get(m.kid)) return;
+  gunlukEkle({t:'begen',kid:m.kid,metin:m.metin,cid:m.cid});
+  m.durum='onay'; akisCiz(); ozetCiz();
 }
 
 /* ---------- havuz ---------- */
@@ -409,7 +412,10 @@ function ozetCiz(){
   return {onay,ornek};
 }
 function havuzCiz(o){
-  $('#hvOzet').innerHTML=`<div class="tile"><b>${sayi(S.konular.size)}</b><span>konu</span></div><div class="tile"><b>${sayi(o.onay)}</b><span>onaylı cevap</span></div><div class="tile"><b>${sayi(o.ornek)}</b><span>henüz onaylanmamış</span></div>`;
+  const gun=S.havuz&&S.havuz.guncelleme?new Date(S.havuz.guncelleme).toLocaleString('tr-TR',{day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'}):'—';
+  const bekleyen=S.yerel.length, gidecek=depoOku('robot-kuyruk',[]).length;
+  $('#hvOzet').innerHTML=`<div class="tile"><b>${sayi(S.konular.size)}</b><span>konu</span></div><div class="tile"><b>${sayi(o.onay)}</b><span>onaylı cevap</span></div><div class="tile"><b>${sayi(o.ornek)}</b><span>henüz onaylanmamış</span></div>
+    <p class="meta" style="grid-column:1/-1;margin:2px 0 0">Ortak havuzun son güncellemesi: <b>${esc(gun)}</b>.${bekleyen?` Senin öğrettiğin <b>${bekleyen}</b> şey bir sonraki güncellemede herkese gidecek (sende şimdiden geçerli).`:''}${gidecek?` <span style="color:var(--warn)">${gidecek} kayıt internet bekliyor, bağlantı gelince gönderilecek.</span>`:''}</p>`;
   const q=norm($('#hvAra').value);
   const ks=aktifKonular().filter(k=>!q||norm(k.ad).includes(q)||soylenisler(k).some(s=>norm(s).includes(q))||cevaplar(k).some(c=>norm(c.metin).includes(q)));
   $('#hvListe').innerHTML=ks.length?ks.map(k=>{
@@ -467,15 +473,15 @@ function bagla(){
     const ky=e.target.closest('[data-kaydet]'); if(ky){ ky.disabled=true; await kaydet(ky.dataset.kaydet); ky.disabled=false; return; }
   });
   document.addEventListener('keydown',e=>{ if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){ const f=e.target.closest&&e.target.closest('[data-form]'); if(f) kaydet(f.dataset.form); } });
-  document.addEventListener('visibilitychange',()=>{ if(!document.hidden) yukle(); });
-  setInterval(()=>{ if(!document.hidden) yukle(); },30000);
+  document.addEventListener('visibilitychange',()=>{ if(!document.hidden){ yukle(); kuyrukGonder(); } });
+  setInterval(()=>{ if(!document.hidden){ yukle(); kuyrukGonder(); } },120000);
 }
 function basla(){
   bagla(); ruhAyarla('*'); sekmeAc(location.hash==='#havuz'?'havuz':'konus');
   const k=kimlikOku(); if(k) S.kim=k; else { kimlikYaz(S.kim); adSor(); }
-  if(SUPABASE_URL.startsWith('__')||!window.supabase){ uyar('Site henüz veritabanına bağlanmadı.'); $('#ozet').textContent='Bağlantı yok'; return; }
-  S.sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:false}});
-  yukle();
+  S.yerel=depoOku('robot-yerel',[]);
+  if(!window.HavuzMantik){ uyar('Sayfa tam yüklenemedi. Sayfayı yenile.'); return; }
+  yukle(); kuyrukGonder();
 }
 basla();
 </script>
