@@ -62,7 +62,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 @keyframes kirp{0%,92%,100%{opacity:1}95%{opacity:.15}}
 @keyframes zipla{0%,100%{translate:0 0}50%{translate:0 -3px}}
 
-main{padding-block:16px 170px}
+main{padding-block:16px 200px}
 .giris{display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;padding:24px 8px 8px}
 .giris h2{font-size:19px}
 .giris p{margin:0;color:var(--muted);max-width:52ch}
@@ -111,6 +111,14 @@ textarea{resize:vertical;min-height:70px;font-size:15.5px}
 .yaz-in{display:flex;gap:8px;padding-top:8px}
 .yaz input{flex:1;min-width:0;font-size:16px;border-radius:12px;padding:11px 14px}
 .yaz .btn{padding:10px 18px}
+.yaz .btn.oto{padding:10px 12px;white-space:nowrap}
+.btn.oto[aria-pressed="true"]{background:var(--soft);border-color:var(--accent);color:var(--accent)}
+.btn.oto .kisa{display:none}
+@media (max-width:420px){.btn.oto .uzun{display:none}.btn.oto .kisa{display:inline}}
+.oto-durum{font-size:12px;color:var(--muted);padding-top:6px}
+.oto-durum b{color:var(--ink)}
+.oto-et{font-size:11.5px;color:var(--muted)}
+.m.sen .slot{color:inherit;text-decoration:underline dotted}
 
 .ozet{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:12px}
 .tile{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
@@ -165,6 +173,7 @@ textarea{resize:vertical;min-height:70px;font-size:15.5px}
       <span class="visor buyuk" id="yuz" aria-hidden="true"><i></i><i></i></span>
       <h2>Robota bir şey söyle</h2>
       <p>Cevabını beğenirsen 👍 de. Beğenmezsen 👎 de ve ne demesi gerektiğini yaz. Robot bunu öğrenir; herkesin robotu da öğrenir.</p>
+      <p>Yazmak istemiyorsan <b>🔁 Otomatik</b>’e bas: robot sana sırayla sorar, sen sadece 👍 ya da 👎 dersin.</p>
       <div class="oneri" id="oneri"></div>
     </div>
     <div class="akis" id="akis" aria-live="polite"></div>
@@ -189,7 +198,9 @@ textarea{resize:vertical;min-height:70px;font-size:15.5px}
     <button data-ruh="yorgun" aria-pressed="false">😴 Yorgun</button>
     <button data-ruh="heyecanlı" aria-pressed="false">🤩 Heyecanlı</button>
   </div>
+  <div class="wrap oto-durum" id="otoDurum" hidden></div>
   <form class="wrap yaz-in" id="yazForm" autocomplete="off">
+    <button class="btn oto" type="button" id="otoBtn" aria-pressed="false" title="Robot sana sırayla soru sorsun, sen sadece 👍 ya da 👎 de">🔁 <span class="uzun">Otomatik</span><span class="kisa">Oto</span></button>
     <input type="text" id="mesaj" placeholder="Robota yaz… (örnek: bugün çok yoruldum)" aria-label="Mesaj" maxlength="200">
     <button class="btn ana" type="submit">Gönder</button>
   </form>
@@ -221,7 +232,7 @@ const RUH_EMOJI={'mutlu':'😄','üzgün':'😢','yorgun':'😴','heyecanlı':'�
 const RUH_SINIF={'*':'','mutlu':'mutlu','üzgün':'uzgun','yorgun':'yorgun','heyecanlı':'heyecanli'};
 /* anlam benzerliği (gerçek üründe embedding modeli yapar) */
 const IFADE=[['ne haber','naber'],['iyi misin','nasılsın'],['iyi geceler','igece'],['sağ ol','sağol'],['ne yesem','acıktım'],['karnım aç','acıktım'],['ne izlesem','izleöner'],['doğum gün','doğumgün'],['kimse yok','yalnız'],['canım sıkılıyor','sıkıldım'],['canım sıkkın','sıkkın'],['komik bir şey','fıkra'],['hey robot','selam'],['müzik aç','şarkı'],['en sevdiğim','ensevdiğim']];
-const KAVRAM=[['SELAM',['merhaba','selam','slm$','mrb$','hey$','günaydın','hello']],['NASIL',['nasılsın','nasıl$','naber','nbr$']],['YORGUN',['yorgun','yorul','yordu','bitik','bitkin','tüken']],['SIKIL',['sıkıl','sıkıcı']],['MUTLU',['mutlu','sevin','harika','süper','neşe']],['UZGUN',['üzgün','üzül','moral','sıkkın','mutsuz','ağla']],['GECE',['igece','yatıyor','uyuyor','uyku','yatmaya']],['TESEKKUR',['teşekkür','sağol','eyvallah']],['SEVGI',['seviyor','sevgi','canımsın']],['FIKRA',['fıkra','güldür','komik','espri','şaka']],['OYUN',['oyun','oyna']],['SARKI',['şarkı','müzik','türkü']],['ACLIK',['acık','yemek','yesem']],['DERS',['ders','ödev','çalış']],['SINAV',['sınav','imtihan','vize$']],['YARIN',['yarın']],['DUN',['dün','bitti','geçti','vardı$']],['GELDIM',['geldi']],['EV',['eve$','evde','evdeyim']],['IZLE',['izleöner','izle','film','dizi','belgesel']],['KIM',['kimsin','adın$','yapabil']],['ISIM',['adım$','ismim$']],['EVCIL',['kedi','köpe','kuşum','balığ','hamster']],['ADI',['adı$','ismi$']],['DOGUM',['doğumgün']],['KAVGA',['kavga','tartış','küs']],['SPOR',['spor','koşu','antrenman','futbol','basket']],['YALNIZ',['yalnız']],['SEVILEN',['ensevdiğim']]];
+const KAVRAM=[['SELAM',['merhaba','selam','slm$','mrb$','hey$','günaydın','hello']],['NASIL',['nasılsın','nasıl$','naber','nbr$']],['YORGUN',['yorgun','yorul','yordu','bitik','bitkin','tüken']],['SIKIL',['sıkıl','sıkıcı']],['MUTLU',['mutlu','sevin','harika','süper','neşe']],['UZGUN',['üzgün','üzül','moral','sıkkın','mutsuz','ağla']],['GECE',['igece','yatıyor','uyuyor','uyku','yatmaya']],['TESEKKUR',['teşekkür','sağol','eyvallah']],['SEVGI',['seviyor','sevgi','canımsın']],['FIKRA',['fıkra','güldür','komik','espri','şaka']],['OYUN',['oyun','oyna']],['SARKI',['şarkı','müzik','türkü']],['ACLIK',['acık','yemek','yesem']],['DERS',['ders','ödev','çalış']],['SINAV',['sınav','imtihan','vize$']],['YARIN',['yarın']],['DUN',['dün','bitti','geçti','vardı$']],['GELDIM',['geldi']],['EV',['eve$','evde','evdeyim']],['IZLE',['izleöner','izle','film','dizi','belgesel']],['KIM',['kimsin','adın$','yapabil']],['ISIM',['adım$','ismim$']],['EVCIL',['kedi','köpe','kuşum','balığ','hamster']],['ADI',['adı$','ismi$']],['DOGUM',['doğumgün']],['KAVGA',['kavga','tartış','küs']],['SPOR',['spor','koşu','antrenman','futbol','basket']],['YALNIZ',['yalnız']],['SEVILEN',['ensevdiğim']],['OKUL',['okul']],['SICAK',['sıcak','terle','bunal']],['SOGUK',['üşü','soğuk','donuyo']],['SINIR',['sinir','kızgın']],['VEDA',['görüşürüz','hoşça','güle$']],['OZUR',['özür','pardon','affeder','kusura']]];
 const DURAK=new Set('ben benim sen seni sana bana beni bir çok ya de da mi mı mu mü ki ve ama bugün artık şu bu o işte biraz hadi var lazım ister misin musun mısın müsün gidiyorum çıkıyorum ettim bak durumdayım gün günü hissediyorum şey anlat söyle söyler kendimi of yaa robot ne bi şimdi oldu olur tamam hep her gibi için ile en'.split(' '));
 
 const $=s=>document.querySelector(s);
@@ -247,7 +258,7 @@ function kimlikOku(){ try{ const k=JSON.parse(localStorage.getItem('robot-kimlik
 function kimlikYaz(k){ try{ localStorage.setItem('robot-kimlik',JSON.stringify(k)); }catch(e){} }
 
 /* ---------- durum ---------- */
-const S={kim:{id:yeniId('u'),ad:''},havuz:null,yerel:[],konular:new Map(),yuklendi:false,sekme:'konus',ruh:'*',akis:[],acik:new Set(),yukleniyor:false};
+const S={kim:{id:yeniId('u'),ad:''},havuz:null,yerel:[],konular:new Map(),yuklendi:false,sekme:'konus',ruh:'*',akis:[],acik:new Set(),yukleniyor:false,oto:false,otoGoruldu:new Set(),otoSorulan:new Set()};
 const aktifKonular=()=>[...S.konular.values()].sort((a,b)=>((a.sira??1000)-(b.sira??1000))||a.ad.localeCompare(b.ad,'tr'));
 const soylenisler=k=>k.soylenisler;
 const cevaplar=k=>k.cevaplar;
@@ -297,7 +308,7 @@ async function yukle(){
   if(S.yukleniyor) return; S.yukleniyor=true;
   try{
     const r=await fetch('havuz.json?t='+Date.now(),{cache:'no-store'}); if(!r.ok) throw new Error(r.status);
-    S.havuz=await r.json(); yenidenKur(); S.yuklendi=true; uyar(''); ciz();
+    S.havuz=await r.json(); yenidenKur(); S.yuklendi=true; uyar(''); ciz(); if(S.oto) otoSor();
   }catch(e){ console.error(e); if(!S.yuklendi) uyar('Havuz yüklenemedi. İnternet bağlantını kontrol edip sayfayı yenile.'); }
   finally{ S.yukleniyor=false; }
 }
@@ -330,11 +341,11 @@ function ruhAyarla(r){
   S.ruh=r; document.querySelectorAll('[data-ruh]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.ruh===r?'true':'false'));
   document.querySelectorAll('.visor').forEach(v=>{ v.classList.remove('mutlu','uzgun','yorgun','heyecanli'); if(RUH_SINIF[r]) v.classList.add(RUH_SINIF[r]); });
 }
-function gonder(metin){
+function gonder(metin,oto){
   metin=metin.trim(); if(!metin) return;
   if(!S.yuklendi){toast('Havuz henüz yüklenmedi, birkaç saniye bekle.');return;}
   const id=yeniId('m'), b=eslestir(metin);
-  const msg={id,metin,ruh:S.ruh,durum:'bekle'};
+  const msg={id,metin,ruh:S.ruh,durum:'bekle',oto:!!oto};
   if(b&&b.sk>=.6){ msg.kid=b.k.id; const r=cevapBul(b.k,S.ruh); if(r){msg.cid=r.c.id; msg.tur=r.tur; msg.cruh=r.c.ruh;} }
   if(!msg.cid) msg.durum='bilmiyor';
   S.akis.push(msg);
@@ -356,7 +367,7 @@ function duzeltFormu(m,baslik){
     </div>
     <input type="text" id="dn-${m.id}" maxlength="80" placeholder="Yeni konunun adı" value="${esc(yeniKonu?cap(m.metin).slice(0,40):'')}" ${yeniKonu?'':'hidden'}>
     <div id="du-${m.id}"></div>
-    <div class="satir" style="justify-content:flex-end"><button class="btn ana kucuk" data-kaydet="${m.id}" type="button">Kaydet</button></div>
+    <div class="satir" style="justify-content:flex-end">${m.oto?`<button class="btn kucuk" data-gec="${m.id}" type="button">⏭ Geç</button>`:''}<button class="btn ana kucuk" data-kaydet="${m.id}" type="button">Kaydet</button></div>
   </div>`;
 }
 function akisCiz(){
@@ -367,8 +378,11 @@ function akisCiz(){
 }
 function mesajHtml(m){
   const k=S.konular.get(m.kid), c=mesajCevap(m);
-  let r=`<div class="m sen"><div class="balon">${esc(m.metin)}</div>${m.ruh!=='*'?`<span class="ruh-et">robot ${RUH_EMOJI[m.ruh]} ${esc(m.ruh)}</span>`:''}</div><div class="m robot">`;
-  if(m.durum==='kaydedildi'){
+  const et=[m.oto?'🔁 otomatik soru':'',m.ruh!=='*'?`robot ${RUH_EMOJI[m.ruh]} ${esc(m.ruh)}`:''].filter(Boolean).join(' · ');
+  let r=`<div class="m sen"><div class="balon">${m.oto?slotlu(m.metin):esc(m.metin)}</div>${et?`<span class="${m.oto?'oto-et':'ruh-et'}">${et}</span>`:''}</div><div class="m robot">`;
+  if(m.durum==='gecildi-bos'){
+    r+=`<div class="balon bilmiyor">Bunu henüz bilmiyorum.</div><span class="meta">⏭ Geçildi</span>`;
+  }else if(m.durum==='kaydedildi'){
     r+=`<div class="balon">${esc(doldur(m.yeniMetin,ctx()))}</div><span class="durum">✓ Öğrendim! ${m.yeniRuh==='*'?'Bundan sonra böyle diyeceğim.':RUH_AD[m.yeniRuh]+' böyle diyeceğim.'}</span><span class="meta">Senin robotunda hemen geçerli. Herkesin robotuna bir sonraki havuz güncellemesinde gider.</span>`;
   }else if(m.durum==='bilmiyor'||!c){
     r+=`<div class="balon bilmiyor">Bunu henüz bilmiyorum. Ne demeliyim?</div>`+duzeltFormu(m,'Bana öğret');
@@ -376,8 +390,9 @@ function mesajHtml(m){
     r+=`<div class="balon">${esc(doldur(c.metin,ctx()))}</div>`;
     const not=m.tur==='ruh'?` · ${RUH_EMOJI[m.ruh]} ${esc(m.ruh)}ken söylediği özel cevap`:m.tur==='genel-yedek'?` · ${esc(m.ruh)}ken özel cevabı yok, genel cevabı söyledi`:'';
     r+=`<span class="meta">Konu: <b>${esc(k?k.ad:'')}</b> · yazan: ${esc(isimAl(c))}${c.durum==='onay'?' · onaylı':''}${not}</span>`;
-    if(m.durum==='bekle') r+=`<div class="tepki"><button class="btn iyi" data-iyi="${m.id}" type="button">👍 Beğendim</button><button class="btn kotu" data-kotu="${m.id}" type="button">👎 Beğenmedim</button></div>`;
+    if(m.durum==='bekle') r+=`<div class="tepki"><button class="btn iyi" data-iyi="${m.id}" type="button">👍 Beğendim</button><button class="btn kotu" data-kotu="${m.id}" type="button">👎 Beğenmedim</button>${m.oto?`<button class="btn" data-gec="${m.id}" type="button">⏭ Geç</button>`:''}</div>`;
     else if(m.durum==='onay') r+=`<span class="durum">✓ Onayladın. Teşekkürler!</span>`;
+    else if(m.durum==='gecildi') r+=`<span class="meta">⏭ Geçildi</span>`;
     else if(m.durum==='duzelt') r+=duzeltFormu(m,'Ne demeliydi?');
   }
   return r+'</div>';
@@ -396,13 +411,60 @@ async function kaydet(id){
   // beğenilmeyen cevap aynı konudaysa "eski" olarak bildirilir; aynı kapsamdaysa (ikisi de "her zaman" ya da aynı ruh hali) yerine yenisi geçer
   gunlukEkle({t:'ogret',kid:hedef,konu_ad:kid==='__yeni'?yeniAd.slice(0,80):undefined,metin:m.metin,cevap:metin,ruh,cid,eski:m.cid&&kid===m.kid?m.cid:undefined});
   if(m.cid&&kid!=='__yeni'&&kid!==m.kid) toast('Konu düzeltildi. Bu cümle artık o konuya gidecek.');
-  m.kid=hedef; m.cid=cid; m.durum='kaydedildi'; m.yeniMetin=metin; m.yeniRuh=ruh; akisCiz(); ozetCiz();
+  m.kid=hedef; m.cid=cid; m.durum='kaydedildi'; m.yeniMetin=metin; m.yeniRuh=ruh; akisCiz(); ozetCiz(); otoSonraki(m);
 }
 async function begen(id){
   const m=S.akis.find(x=>x.id===id); if(!m||!m.cid||!S.konular.get(m.kid)) return;
   gunlukEkle({t:'begen',kid:m.kid,metin:m.metin,cid:m.cid});
-  m.durum='onay'; akisCiz(); ozetCiz();
+  m.durum='onay'; akisCiz(); ozetCiz(); otoSonraki(m);
 }
+
+/* ---------- otomatik mod ----------
+   Robot soruyu kendisi sorar, kişi yalnız 👍 / 👎 / Geç der.
+   1. aşama: henüz onaylanmamış cevaplar (konusu doğrudan seçilir, ruh haline özel cevaplar o ruh haliyle sorulur).
+   2. aşama: bekleyen kalmayınca konuların farklı söylenişleri normal eşleştirmeyle sorulur (robot doğru konuyu buluyor mu kontrolü).
+   Bu oturumda sorulan bir daha sorulmaz. */
+function otoBekleyenler(){
+  const l=[];
+  for(const k of aktifKonular()){
+    const duz=soylenisler(k).filter(s=>!s.includes('{')), ss=duz.length?duz:soylenisler(k); if(!ss.length) continue;
+    for(const c of cevaplar(k)) if(c.durum!=='red'&&c.durum!=='onay'&&!S.otoGoruldu.has(c.id)) l.push({k,c,ss});
+  }
+  return l;
+}
+function otoKontroller(){
+  const l=[];
+  for(const k of aktifKonular()) for(const s of soylenisler(k)) if(!s.includes('{')&&!S.otoSorulan.has(k.id+'|'+norm(s))) l.push({k,s});
+  return l;
+}
+function otoDurumCiz(){
+  const e=$('#otoDurum'); if(!S.oto){e.hidden=true;return;}
+  const n=otoBekleyenler().length; e.hidden=false;
+  e.innerHTML=n?`🔁 Otomatik açık · onay bekleyen <b>${sayi(n)}</b> cevap var · durdurmak için 🔁’e tekrar bas`:`🔁 Otomatik açık · onay bekleyen cevap kalmadı, şimdi kontrol soruları geliyor`;
+}
+function otoAcikSoru(){ return S.akis.some(m=>m.oto&&['bekle','duzelt','bilmiyor'].includes(m.durum)); }
+function otoSor(){
+  if(!S.oto||!S.yuklendi||otoAcikSoru()) return;
+  const son=[...S.akis].reverse().find(m=>m.oto), farkli=l=>{const f=l.filter(x=>!son||x.k.id!==son.kid); return f.length?f:l;};
+  const bek=otoBekleyenler();
+  if(bek.length){
+    const x=pick(farkli(bek));
+    S.otoGoruldu.add(x.c.id); S.otoSorulan.add(x.k.id+'|'+norm(x.ss[0]));
+    S.akis.push({id:yeniId('m'),metin:pick(x.ss),ruh:x.c.ruh,durum:'bekle',oto:true,kid:x.k.id,cid:x.c.id,cruh:x.c.ruh,tur:x.c.ruh==='*'?'genel':'ruh'});
+    akisCiz(); otoDurumCiz(); setTimeout(()=>window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'}),30);
+    return;
+  }
+  const kon=otoKontroller();
+  if(!kon.length){ toast('Sorulacak bir şey kalmadı, hepsine baktın. Teşekkürler! 🎉'); otoAc(false); return; }
+  const x=pick(farkli(kon)); S.otoSorulan.add(x.k.id+'|'+norm(x.s));
+  gonder(x.s,true); otoDurumCiz();
+}
+function otoAc(ac){
+  S.oto=!!ac; $('#otoBtn').setAttribute('aria-pressed',S.oto?'true':'false'); otoDurumCiz();
+  if(S.oto){ if(otoAcikSoru()) toast('Önce açık soruyu cevapla, sonra sıradaki gelecek.'); else otoSor(); }
+}
+function otoSonraki(m){ if(S.oto&&m&&m.oto) setTimeout(otoSor,700); }
+function gec(id){ const m=S.akis.find(x=>x.id===id); if(!m) return; m.durum=m.cid&&mesajCevap(m)?'gecildi':'gecildi-bos'; akisCiz(); otoSonraki(m); }
 
 /* ---------- havuz ---------- */
 function ozetCiz(){
@@ -444,7 +506,7 @@ function sekmeAc(s){
   ciz();
 }
 function ciz(){
-  const o=ozetCiz();
+  const o=ozetCiz(); otoDurumCiz();
   if(S.sekme==='havuz') havuzCiz(o);
   else if(!(document.activeElement&&document.activeElement.closest&&document.activeElement.closest('.duzelt'))) akisCiz();
   const ks=aktifKonular();
@@ -460,6 +522,7 @@ function bagla(){
   $('#adForm').onsubmit=e=>{e.preventDefault(); adKaydet($('#adGir').value);};
   $('#adAtla').onclick=()=>adKaydet('');
   $('#adDegis').onclick=adSor;
+  $('#otoBtn').onclick=()=>otoAc(!S.oto);
   $('#hvAra').addEventListener('input',()=>ciz());
   $('#hvListe').addEventListener('toggle',e=>{const d=e.target; if(!d.dataset||!d.dataset.kid) return; const was=S.acik.has(d.dataset.kid); if(d.open) S.acik.add(d.dataset.kid); else S.acik.delete(d.dataset.kid); if(was!==d.open) ciz();},true);
   $('#hvJson').onclick=()=>indir(`robot-havuzu-${new Date().toISOString().slice(0,10)}.json`,JSON.stringify({tarih:new Date().toISOString(),konular:disaVeri()},null,2),'application/json');
@@ -470,6 +533,7 @@ function bagla(){
     const sl=e.target.closest('[data-slot]'); if(sl){ const t=document.getElementById(sl.dataset.hedef); if(t){ const p=t.selectionStart??t.value.length; t.value=t.value.slice(0,p)+sl.dataset.slot+t.value.slice(t.selectionEnd??p); t.focus(); } return; }
     const iy=e.target.closest('[data-iyi]'); if(iy){ iy.disabled=true; await begen(iy.dataset.iyi); iy.disabled=false; return; }
     const ko=e.target.closest('[data-kotu]'); if(ko){ const m=S.akis.find(x=>x.id===ko.dataset.kotu); if(m){ m.durum='duzelt'; akisCiz(); setTimeout(()=>{const t=document.getElementById('dz-'+m.id); if(t) t.focus();},30);} return; }
+    const gc=e.target.closest('[data-gec]'); if(gc){ gec(gc.dataset.gec); return; }
     const ky=e.target.closest('[data-kaydet]'); if(ky){ ky.disabled=true; await kaydet(ky.dataset.kaydet); ky.disabled=false; return; }
   });
   document.addEventListener('keydown',e=>{ if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){ const f=e.target.closest&&e.target.closest('[data-form]'); if(f) kaydet(f.dataset.form); } });
